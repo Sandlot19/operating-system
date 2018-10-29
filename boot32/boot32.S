@@ -11,7 +11,7 @@
 
 boot32_start:
   /* Set up the stack pointer to 0x5000 */
-  move    esp, 0x5000
+  mov     esp, 0x5000
   call    main
 
   test    eax, eax
