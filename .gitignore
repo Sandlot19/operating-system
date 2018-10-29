@@ -3,5 +3,9 @@
 # Unignore directories
 !*/
 
-# Unignore files with extensions
-!*.*
+# Unignore source files
+!*.cc
+!*.cpp
+!*.c
+!*.S
+!makefile
