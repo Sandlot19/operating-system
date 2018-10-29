@@ -1,34 +1,32 @@
-CXX = g++
+CXX = gcc
 ASM_FLAGS = -x assembler
 CXX_FLAGS = -x c++ -ffreestanding -nostdlib -Wall -Wextra -std=c++11 -I.
 LD_FLAGS = -Tscript.ld -ffreestanding -nostdlib -z max-page-size=0x1000 -Wl,--build-id=none -static
-SRC_CPP = $(wildcard *.cc)
+SRC_C = $(wildcard *.c)
 SRC_ASM = $(wildcard *.S)
-OBJS := $(patsubst %.S,objs/%.o, $(SRC_ASM))
-OBJS += $(patsubst %.cc,objs/%.o, $(SRC_CPP))
-DEPS = $(patsubst %.cpp,deps/%.d, $(SRC_CPP))
+ASM_OBJS = $(patsubst %.S,objs/%.o, $(SRC_ASM))
+C_OBJS = $(patsubst %.c,objs/%.o, $(SRC_C))
+OBJS := $(ASM_OBJS)
+OBJS += $(C_OBJS)
 OUT = boot.bin
 ELF = boot.elf
 OBJCOPY = objcopy
 MKDIR = mkdir -p
-DIRS = objs deps
+DIRS = objs
 
 all: $(DIRS) $(OUT)
-
-include $(wildcard deps/*.d)
 
 $(DIRS):
 	@$(MKDIR) $@
 
-$(OUT): $(OBJS) makefile script.ld
+$(OUT): $(OBJS)
 	$(CXX) $(LD_FLAGS) -o $(ELF) $(OBJS)
 	$(OBJCOPY) -O binary $(ELF) $(OUT)
 
-objs/%.o: %.cc makefile script.ld
+$(C_OBJS): $(SRC_C)
 	$(CXX) $(CXX_FLAGS) -o $@ -c $<
-	@mv objs/$(patsubst %.cc,%.d,$<) ./deps
 
-objs/%.o: %.S makefile script.ld
+$(ASM_OBJS): $(SRC_ASM)
 	$(CXX) $(ASM_FLAGS) -o $@ -c $<
 
 .PHONY: clean

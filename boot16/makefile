@@ -26,7 +26,6 @@ $(OUT): $(OBJS) makefile script.ld
 
 objs/%.o: %.cc makefile script.ld
 	$(CXX) $(CXX_FLAGS) -o $@ -c $<
-	@mv objs/$(patsubst %.cc,%.d,$<) ./deps
 
 objs/%.o: %.S makefile script.ld
 	$(CXX) $(ASM_FLAGS) -o $@ -c $<

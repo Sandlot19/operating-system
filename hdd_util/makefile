@@ -8,7 +8,7 @@ OUT=hdd_writer
 
 all: $(OBJ)
 	$(CXX) $(CFLAGS) -o $(OUT) $(OBJ)
-	mv $(OUT) ..
+	@mv $(OUT) ..
 
 $(OBJ): $(SRC)
 	$(CXX) $(CFLAGS) -c $(SRC)

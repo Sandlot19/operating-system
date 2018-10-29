@@ -1,12 +1,12 @@
 TOPTARGETS = all clean
-DIRS=$(wildcard */.)
+DIRS:=$(filter-out $(wildcard checkpoint*/.), $(wildcard */.))
 
 $(TOPTARGETS): $(DIRS)
 
 $(DIRS):
-	$(MAKE) -C $@ $(MAKECMDGOALS)
+	@$(MAKE) -C $@ $(MAKECMDGOALS)
 
 clean:
-	rm -rf hdd.hdd hdd_writer 
+	rm -rf hdd_writer
 
 .PHONY: $(TOPTARGETS) $(DIRS)
