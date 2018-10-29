@@ -1,4 +1,4 @@
-#include "boot32.h"
+#include "boot32_c.h"
 
 #define MAX_READ_SECTORS 128
 
@@ -60,12 +60,32 @@ bool AtaRead(uint16_t* buffer, uint32_t lba, uint32_t sectors, uint8_t drive)
     // Specify LBA[7:0]
     out_byte(SECTOR_NUMBER_REGISTER_PORT, (uint8_t)lba);
     // Specify LBA[15:8]
-    out_byte(CYLINDER_LOW_REGISTER_PORT, (uint8_t)(lba >> 8))
+    out_byte(CYLINDER_LOW_REGISTER_PORT, (uint8_t)(lba >> 8));
     // Specify LBA[23:16]
-    out_byte(CYLINDER_HIGH_REGISTER_PORT, (uint8_t)(lba >> 16))
+    out_byte(CYLINDER_HIGH_REGISTER_PORT, (uint8_t)(lba >> 16));
+
+    out_byte(STATUS_COMMAND_REGISTER_PORT, READ_SECTORS_COMMAND);
+
+    for (uint32_t j = 0; j < sectors_to_read; j++) {
+
+      /* Busy loop to wait for the busy bit to be set to 0. If the busy bit is
+       * set, then the drive is not ready to produce data. */
+      while (in_byte(ALTERNATE_STATUS_REGISTER_PORT) & (1 << BUSY_BIT_POSITION)) {
+        asm volatile("pause\n");
+        for (volatile uint32_t i = 0; i < 1000;i++);
+      }
+
+      /* Busy loop has ended, the drive is ready to be read from */
+      for (uint32_t i = 0; i < 256; i++) {
+        *(buffer++) = in_word(DATA_REGISTER_PORT);
+      }
+    }
   }
+
+  return true;
 }
 
 int main(void)
 {
+  return 0;
 }
