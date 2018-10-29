@@ -65,19 +65,17 @@ bootjump:
   lea   si, [INFO] /* print function expects string to be in si */
   call  print
   
-  /*
-   * If the carry flag is set, there was an error.
-   * jc readerror
-   */
-
   mov   ax, cr0
   or    ax, 1
   mov   cr0, ax
 
-  lgdt  [ GDT32 ]
+  lgdt  [GDT32]
 
   mov   ax, 16
   mov   ds, ax
+
+  lea   si, [DONE] /* print function expects string to be in si */
+  call  print
 
   jmp   8:0x8200
 
