@@ -1,6 +1,8 @@
 #include "boot32_c.h"
 
 #define MAX_READ_SECTORS 128
+#define EXIT_FAILURE 0
+#define BOCHS_DEBUG(c) out_byte(0xE9, c)
 
 static inline uint8_t in_byte(uint16_t port)
 {
