@@ -39,22 +39,31 @@ void HddWriter::Write() {
     return;
   }
 
-  // The buffer will start as 4096 bytes, to hold both the 16 and 32 bit
-  // bootloaders
-  std::vector<uint8_t> buffer(kSectorSize * 8);
+  // Make the initial size of the buffer one sector, to hold the 16 bit boot
+  // loader
+  std::vector<uint8_t> buffer(kSectorSize);
+
 
   // Read boot16.bin into buffer
   ReadFile(boot16, &buffer);
 
+  WriteBuffer(buffer);
+  buffer.clear();
+
+  // The next 7 sectors are for the 32 bit boot loader
+  // padded with 0s
+  buffer.resize(kSectorSize * 7, 0);
+
   // Read boot32.bin into buffer
-  // TODO: write 32 bit bootloader
   ReadFile(boot32, &buffer);
 
   WriteBuffer(buffer);
+  buffer.clear();
 
   buffer.clear();
-  buffer.resize(kMinDiskSize - (kSectorSize * 8), 0);
 
+  // Pad the rest of the disk with 0s
+  buffer.resize(kMinDiskSize - (kSectorSize * 9) - kernel_size, 0);
   WriteBuffer(buffer);
 
   // TODO: Get kernel size, resize buffer, read kernel into buffer, write buffer
