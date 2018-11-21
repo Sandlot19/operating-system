@@ -27,6 +27,12 @@
 #define KERNEL_LOC                      0x1000
 #define DRIVE_BOOT                      0
 
+typedef struct kernel_info_t {
+  uint32_t kernel_size_;
+  uint32_t kernel_physical_location_;
+  uint8_t __padding__[BYTES_PER_SECTOR - 8];
+} kernel_info;
+
 bool AtaRead(uint16_t* buffer, uint32_t lba, uint32_t sectors, uint8_t drive);
 
 #endif // _BOOT32_C_H_
