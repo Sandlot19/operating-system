@@ -17,9 +17,15 @@
 
 // See ATA Specification Section 4.1
 #define BUSY_BIT_POSITION               7
+#define DRQ_BIT_POSITION                3
 
 // See ATA Specification Section 5.4.10
 #define READ_SECTORS_COMMAND            0x20
+
+#define BYTES_PER_SECTOR                512
+#define KERNEL_START                    0x100000
+#define KERNEL_LOC                      0x1000
+#define DRIVE_BOOT                      0
 
 bool AtaRead(uint16_t* buffer, uint32_t lba, uint32_t sectors, uint8_t drive);
 
