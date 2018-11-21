@@ -1,7 +1,7 @@
 CXX = gcc
-ASM_FLAGS = -x assembler
-CXX_FLAGS = -x c -ffreestanding -nostdlib -Wall -Wextra -I. -fno-stack-protector -MD -MP -O2
-LD_FLAGS = -Tscript.ld -ffreestanding -nostdlib -z max-page-size=0x1000 -Wl,--build-id=none -static -fno-stack-protector
+ASM_FLAGS = -x assembler -m32
+CXX_FLAGS = -x c -ffreestanding -nostdlib -Wall -Wextra -I. -fno-stack-protector -MD -MP -O2 -m32
+LD_FLAGS = -Tscript.ld -ffreestanding -nostdlib -z max-page-size=0x1000 -Wl,--build-id=none -static -fno-stack-protector -m32
 SRC_C = $(wildcard *.c)
 SRC_ASM = $(wildcard *.S)
 ASM_OBJS = $(patsubst %.S,objs/%.o, $(SRC_ASM))
