@@ -28,14 +28,17 @@ HddWriter::~HddWriter() {
 void HddWriter::Write() {
   FILE* boot16 = fopen(boot16_source_.c_str(), "r");
   FILE* boot32 = fopen(boot32_source_.c_str(), "r");
+  FILE* kernel = fopen(kernel_start_.c_str(), "r");
   if (boot16 == nullptr) {
-    //fprintf(stderr, "error opening %s\n", boot16_source_.c_str());
     perror(boot16_source_.c_str());
     return;
   }
   else if (boot32 == nullptr) {
-    //fprintf(stderr, "error opening %s\n", boot32_source_.c_str());
     perror(boot32_source_.c_str());
+    return;
+  }
+  else if (kernel == nullptr) {
+    perror(kernel_start_.c_str());
     return;
   }
 
@@ -60,13 +63,31 @@ void HddWriter::Write() {
   WriteBuffer(buffer);
   buffer.clear();
 
+  // The kernel size is the first 4 bytes of the sector following the 32 bit
+  // boot loader. Get that number and resize buffer to read in the kernel
+  uint32_t kernel_size = GetKernelSize(kernel);
+
+  buffer.resize(kSectorSize);
+  buffer[0] = static_cast<uint8_t>(kernel_size & 0xFF);
+  buffer[1] = static_cast<uint8_t>((kernel_size >> 8) & 0xFF);
+  buffer[2] = static_cast<uint8_t>((kernel_size >> 16) & 0xFF);
+  buffer[3] = static_cast<uint8_t>((kernel_size >> 24) & 0xFF);
+
+  WriteBuffer(buffer);
+  buffer.clear();
+  buffer.resize(kernel_size, 0);
+
+  // Read kernel.bin into buffer
+  ReadFile(kernel, &buffer);
+
+  // write kernel to hdd file
+  WriteBuffer(buffer);
   buffer.clear();
 
   // Pad the rest of the disk with 0s
   buffer.resize(kMinDiskSize - (kSectorSize * 9) - kernel_size, 0);
   WriteBuffer(buffer);
 
-  // TODO: Get kernel size, resize buffer, read kernel into buffer, write buffer
   printf("%s: hard drive file written\n", __func__);
 }
 
@@ -75,8 +96,15 @@ void HddWriter::ReadFile(FILE* f, std::vector<uint8_t>* buffer) const {
 }
 
 void HddWriter::WriteBuffer(const std::vector<uint8_t>& buffer) const {
-
   fwrite(buffer.data(), buffer.size(), 1, output_file_);
-
   return;
+}
+
+uint32_t HddWriter::GetKernelSize(FILE* kernel_file) const {
+  uint32_t size;
+  fseek(kernel_file, 0, SEEK_END);
+  size = ftell(kernel_file);
+  rewind(kernel_file);
+  printf("%s: kernel size is: %d\n", __func__, size);
+  return size;
 }

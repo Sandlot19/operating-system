@@ -14,6 +14,7 @@ class HddWriter {
   private:
     void WriteBuffer(const std::vector<uint8_t>& buffer) const;
     void ReadFile(FILE* f, std::vector<uint8_t>* buffer) const;
+    uint32_t GetKernelSize(FILE* kernel_file) const;
     FILE* output_file_;
     const std::string boot16_source_;
     const std::string boot32_source_;
