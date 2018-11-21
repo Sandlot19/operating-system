@@ -46,7 +46,7 @@ bool AtaRead(uint16_t* buffer, uint32_t lba, uint32_t sectors, uint8_t drive)
   for (sectors_read = 0; sectors_read < sectors;
        sectors_read += MAX_READ_SECTORS, lba += MAX_READ_SECTORS) {
 
-    uint8_t sectors_to_read = (sectors - sectors_read > MAX_READ_SECTORS)
+    uint8_t sectors_to_read = ((sectors - sectors_read) > MAX_READ_SECTORS)
                                 ? MAX_READ_SECTORS
                                 : sectors - sectors_read;
 
@@ -74,7 +74,7 @@ bool AtaRead(uint16_t* buffer, uint32_t lba, uint32_t sectors, uint8_t drive)
        * set, then the drive is not ready to produce data. */
       while (in_byte(ALTERNATE_STATUS_REGISTER_PORT) & (1 << BUSY_BIT_POSITION)) {
         asm volatile("pause\n");
-        for (volatile uint32_t i = 0; i < 1000;i++);
+        for (volatile uint32_t i = 0; i < 1000; i++);
       }
 
       /* Busy loop has ended, the drive is ready to be read from */
