@@ -64,6 +64,9 @@ bootjump:
 
   lea   si, [INFO] /* print function expects string to be in si */
   call  print
+
+  lea   si, [DONE] /* print function expects string to be in si */
+  call  print
   
   mov   ax, cr0
   or    ax, 1
@@ -74,12 +77,10 @@ bootjump:
   mov   ax, 16
   mov   ds, ax
 
-  lea   si, [DONE] /* print function expects string to be in si */
-  call  print
-
   jmp   8:0x8200
 
 print:
+  cld
   mov   ah, 0x0E /* put the "display char" command in the command register */
 
 .printchar:
