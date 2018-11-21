@@ -77,9 +77,11 @@ bool AtaRead(uint16_t* buffer, uint32_t lba, uint32_t sectors, uint8_t drive)
         for (volatile uint32_t i = 0; i < 1000; i++);
       }
 
-      /* Busy loop has ended, the drive is ready to be read from */
-      for (uint32_t i = 0; i < 256; i++) {
-        *(buffer++) = in_word(DATA_REGISTER_PORT);
+      if (in_byte(ALTERNATE_STATUS_REGISTER_PORT) & (1 << DRQ_BIT_POSITION)) {
+        /* Busy loop has ended, the drive is ready to be read from */
+        for (uint32_t i = 0; i < 256; i++) {
+          *(buffer++) = in_word(DATA_REGISTER_PORT);
+        }
       }
     }
   }
