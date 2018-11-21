@@ -2,7 +2,7 @@
 
 #define MAX_READ_SECTORS 128
 
-inline uint8_t in_byte(uint16_t port)
+static inline uint8_t in_byte(uint16_t port)
 {
   uint8_t data = -1;
   asm volatile (
@@ -14,7 +14,7 @@ inline uint8_t in_byte(uint16_t port)
   return data;
 }
 
-inline uint16_t in_word(uint16_t port)
+static inline uint16_t in_word(uint16_t port)
 {
   uint16_t data = -1;
   asm volatile (
@@ -26,7 +26,7 @@ inline uint16_t in_word(uint16_t port)
   return data;
 }
 
-inline void out_byte(uint16_t port, uint8_t data)
+static inline void out_byte(uint16_t port, uint8_t data)
 {
   asm volatile (
       "outb %0, %1"
