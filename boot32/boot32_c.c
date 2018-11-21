@@ -91,5 +91,30 @@ bool AtaRead(uint16_t* buffer, uint32_t lba, uint32_t sectors, uint8_t drive)
 
 int main(void)
 {
-  return 0;
+  kernel_info kinfo;
+  bool ata_result;
+  uint32_t lba_start = 0x1200 / BYTES_PER_SECTOR;
+
+  /* Read kinfo struct from first sector of the disk following the 16 and 32 bit
+   * bootloaders
+  ata_result = AtaRead((uint16_t*)&kinfo,
+                       0x1000 / BYTES_PER_SECTOR,
+                       1,
+                       DRIVE_BOOT);
+  */
+
+  //if (ata_result == false) return EXIT_FAILURE;
+
+  kinfo.kernel_physical_location_ = KERNEL_START;
+
+  //uint32_t kernel_sectors = (kinfo.kernel_size_ / BYTES_PER_SECTOR) + 1;
+
+  /* Now we know the size of the kernel (in number of sectors) so we can read in
+   * that number of sectors to the specified location of the kernel */
+  ata_result = AtaRead((uint16_t*)kinfo.kernel_physical_location_,
+                       lba_start,
+                       1,
+                       DRIVE_BOOT);
+
+  return kinfo.kernel_physical_location_;
 }
