@@ -1,7 +1,7 @@
 TOPTARGETS = all clean
 DIRS:=$(filter-out $(wildcard checkpoint*/.), $(wildcard */.))
 
-$(TOPTARGETS): $(DIRS)
+$(TOPTARGETS): $(DIRS) hdd
 
 $(DIRS):
 	@$(MAKE) -C $@ $(MAKECMDGOALS)
