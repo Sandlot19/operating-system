@@ -4,6 +4,7 @@
 !*/
 
 # Unignore source files
+!*.h
 !*.cc
 !*.cpp
 !*.c
