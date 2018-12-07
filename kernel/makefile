@@ -1,38 +1,29 @@
-CC := g++
-ASM_SRC := $(wildcard *.S)
-CXX_SRC := $(wildcard *.cc)
-ASM_OBJ := $(patsubst %.S,objs/%.o,$(ASM_SRC))
-CXX_OBJ := $(patsubst %.cc,objs/%.o,$(CXX_SRC))
-OBJS_ALL := $(ASM_OBJ)
-OBJS_ALL += $(CXX_OBJ)
-#OBJS_ALL += $(C_OBJ)
-DEPS := $(patsubst %.cc,deps/%.d,$(CXX_SRC))
-OUT = kernel.bin
-ELF = kernel.elf
-OBJCOPY = objcopy
-DIRS := objs deps
-MKDIR := mkdir -p
+TOPTARGETS = all
+export OBJDIR=objs
+export DEPDIR=deps
+export INCDIR=$(realpath include)
+DIRS=${OBJDIR} ${DEPDIR} include
+MODULE_DIRS=$(filter-out $(foreach DIR, ${DIRS}, $(addsuffix /., ${DIR})), $(wildcard */.))
 
--include FLAGS.gnu $(DEPS)
+BIN=kernel.bin
+ELF=kernel.elf
 
-all: $(DIRS) $(OUT)
+-include FLAGS.gnu
 
-$(DIRS):
-	@$(MKDIR) $@
+.PHONY: ${TOPTARGETS} ${DIRS} ${MODULE_DIRS}
+${TOPTARGETS}: ${DIRS} ${MODULE_DIRS} ${BIN}
+	objcopy -O binary ${ELF} ${BIN}
 
-$(DEPS_ALL): $(ASM_SRC) $(CXX_SRC)
+${BIN}:
+	${CXX} ${LDFLAGS} -o ${ELF} $(wildcard ${OBJDIR}/*.o)
 
-$(OUT): $(OBJS_ALL)
-	$(CC) $(LDFLAGS) -o $(ELF) $(OBJS_ALL)
-	$(OBJCOPY) -O binary $(ELF) $(OUT)
+${DIRS}:
+	$(foreach DIR, $@, $(shell mkdir -p ${DIR}))
 
-objs/%.o: %.cc
-	$(CC) -o $@ -c $(CXXFLAGS) -MF $(patsubst %.cc,deps/%.d,$<) $<
-
-objs/%.o: %.S
-	$(CC) -o $@ -c $(ASMFLAGS) $<
+${MODULE_DIRS}:
+	${MAKE} -C $@ ${MAKECMDGOALS}
 
 clean:
-	@rm -rf $(ELF) $(OUT) $(DIRS)
+	rm -rf ${OBJDIR} ${DEPDIR} ${BIN} ${ELF}
 
-.PHONY: all clean dirs
+include ${DEPS}
