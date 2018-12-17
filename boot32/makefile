@@ -9,30 +9,35 @@ C_OBJS = $(patsubst %.c,objs/%.o, $(SRC_C))
 OBJS := $(ASM_OBJS)
 OBJS += $(C_OBJS)
 DEPS := $(patsubst %.c,deps/%.d,$(SRC_C))
-OUT = boot.bin
-ELF = boot.elf
+OUT = boot32.bin
+ELF = boot32.elf
 OBJCOPY = objcopy
 MKDIR = mkdir -p
 DIRS = objs deps
-
--include $(DEPS)
 
 all: $(DIRS) $(OUT)
 
 $(DIRS):
 	@$(MKDIR) $@
 
-$(OUT): $(OBJS)
-	$(CXX) $(LD_FLAGS) -o $(ELF) $(OBJS)
+$(OUT): $(ELF)
 	$(OBJCOPY) -O binary $(ELF) $(OUT)
 
-$(C_OBJS): $(SRC_C)
-	$(CXX) $(CXX_FLAGS) -MF $(DEPS) -o $@ -c $<
+$(ELF): $(ASM_OBJS) $(C_OBJS)
+	$(CXX) $(LD_FLAGS) -o $(ELF) $(ASM_OBJS) $(C_OBJS)
 
-$(ASM_OBJS): $(SRC_ASM)
+objs/%.o: %.c deps/%.d
+	$(CXX) $(CXX_FLAGS) -MF $(patsubst %.o,deps/%.d,$(@F)) -o $@ -c $<
+
+objs/%.o: %.S
 	$(CXX) $(ASM_FLAGS) -o $@ -c $<
+
+deps/%.d: ;
+.PRECIOUS: deps/%.d
+
+include $(DEPS)
 
 clean:
 	rm -rf $(DIRS) $(ELF) $(OUT)
 
-.PHONY: all $(DIRS) clean
+.PHONY: all clean

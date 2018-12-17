@@ -15,4 +15,4 @@ ${OBJDIR}/%.o: %.cc ${DEPDIR}/%.d
 ${DEPDIR}/%.d: ;
 .PRECIOUS: ${DEPDIR}/%.d
 
-include $(${SRC}.cc=.o)
+include ${DEP}
