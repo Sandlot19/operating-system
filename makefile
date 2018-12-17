@@ -2,7 +2,6 @@ TOPTARGETS = all clean
 DIRS:=$(filter-out $(wildcard checkpoint*/.), $(wildcard */.))
 DIRS:=$(filter-out $(wildcard bochs/.), $(DIRS))
 
-
 $(TOPTARGETS): $(DIRS)
 
 all: hdd
