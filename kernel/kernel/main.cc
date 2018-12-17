@@ -1,9 +1,9 @@
-#include "terminal.h"
+#include <terminal.h>
 
 int main(void) {
   Terminal& term = Terminal::GetTerm();
   term.ClearScreen();
-  term.Write("Hello world!");
+  term.print("Hello world! This is the %d day of %s!", 13, "December");
   while(1);
   return 0;
 }
