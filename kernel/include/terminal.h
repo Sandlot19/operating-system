@@ -10,15 +10,19 @@
 class Terminal
 {
   public:
-    void Write(const char* message);
+    void print(const char* format, ...);
     void ClearScreen();
     static Terminal& GetTerm();
 
   private:
     Terminal(uint64_t vga_location);
     Terminal(const Terminal&) = delete;
+    void Write(const char* message);
+    void Write(uint64_t num);
+    void Write(char character);
     uint16_t ConvertToTermChar(uint8_t fg, uint8_t bg, uint8_t character);
-    uint16_t ConvertToTermCursor(uint8_t x, uint8_t y);
+    uint16_t ConvertToTermCursor(uint8_t x, uint8_t y) const;
+    uint16_t GetTermCursor() const;
     void MoveCursorTo(uint8_t x, uint8_t y);
 
     volatile uint16_t* const vga_buf_;
