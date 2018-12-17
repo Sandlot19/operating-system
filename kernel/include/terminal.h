@@ -15,12 +15,13 @@ class Terminal
     static Terminal& GetTerm();
 
   private:
-    Terminal();
+    Terminal(uint64_t vga_location);
     Terminal(const Terminal&) = delete;
     uint16_t ConvertToTermChar(uint8_t fg, uint8_t bg, uint8_t character);
     uint16_t ConvertToTermCursor(uint8_t x, uint8_t y);
     void MoveCursorTo(uint8_t x, uint8_t y);
 
+    volatile uint16_t* const vga_buf_;
     uint8_t cursor_x_;
     uint8_t cursor_y_;
 };

@@ -12,11 +12,14 @@ namespace
 
 Terminal& Terminal::GetTerm()
 {
-  static Terminal term;
+  static Terminal term(kVgaLocation);
   return term;
 }
 
-Terminal::Terminal() {}
+Terminal::Terminal(uint64_t vga_location)
+  : vga_buf_(reinterpret_cast<uint16_t*>(vga_location)),
+    cursor_x_(0),
+    cursor_y_(0) {}
 
 uint16_t Terminal::ConvertToTermChar(uint8_t fg, uint8_t bg, uint8_t character)
 {
