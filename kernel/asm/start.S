@@ -27,7 +27,7 @@ _start:
 
   // Set up the PDP (address 0x2000)
   // 0x2000 follows right behind PML4
-  // PML4 iis at 0x1000 + (512 entries * 8 bytes per) = 0x2000
+  // PML4 is at 0x1000 + (512 entries * 8 bytes per) = 0x2000
   mov   edi, 0x2000
   mov   DWORD PTR [edi], (1 << 7) /* Gb page */ | (1 << 1) /* R/W */ | (1 << 0) /* P */
   mov   DWORD PTR [edi+4], 0
