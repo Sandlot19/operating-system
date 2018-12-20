@@ -4,10 +4,13 @@
 
 .global _start
 _start:
+  /* Enable Physical Address Extensions (PAE) which allows for 48 bit
+   * addressing of physical memory. Bit 5 of CR4 will enable PAE */
   mov   eax, cr4
   or    eax, 1 << 5
   mov   cr4, eax
 
+  /* Program the MMU to disable caching and set the address of the PML4 */
   mov   edi, 0x1000 | (1 << 4) /* PCD */
   mov   cr3, edi
 
@@ -20,6 +23,9 @@ _start:
   mov   ecx, 511
 
 1:
+  /* Program the PML4 aka the highest level page table. Above, we put in the
+   * location of the PDP into the first entry. Here, zero out the other 511
+   * entries. */
   add   edi, 8 /* 8 bytes per entry */
   mov   DWORD PTR [edi], 0
   mov   DWORD PTR [edi+4], 0
@@ -28,8 +34,10 @@ _start:
   // Set up the PDP (address 0x2000)
   // 0x2000 follows right behind PML4
   // PML4 is at 0x1000 + (512 entries * 8 bytes per) = 0x2000
+
+  /* PDP will have one entry to a 1 GiB page with the other 511 entries set to 0 */
   mov   edi, 0x2000
-  mov   DWORD PTR [edi], (1 << 7) /* Gb page */ | (1 << 1) /* R/W */ | (1 << 0) /* P */
+  mov   DWORD PTR [edi], (1 << 7) /* GiB page */ | (1 << 1) /* R/W */ | (1 << 0) /* P */
   mov   DWORD PTR [edi+4], 0
 
   // zero out the rest of the entries
